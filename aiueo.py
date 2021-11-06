@@ -1,4 +1,3 @@
-
 from PIL import Image, ImageTk
 import tkinter as tk
 
@@ -9,7 +8,7 @@ import settings as sett
 aiueo_window = tk.Tk()
 
 # 視窗標題
-aiueo_window.title('DaiTomko')
+aiueo_window.title('50音')
 # 視窗大小
 aiueo_window.geometry('800x1000')
 # 背景顏色
@@ -194,5 +193,15 @@ button_we.grid(row=3, column=9, sticky=sett.align_mode)
 button_wo.grid(row=4, column=9, sticky=sett.align_mode)
 # ん
 button_n.grid(row=0, column=10, rowspan=5, sticky=sett.align_mode)
+
+
+# 空白排版
+def to_main_window():
+    aiueo_window.destroy()
+    from main import main_window
+
+
+button_back = tk.Button(aiueo_window, text='返回', padx=70, pady=70, bg='#ACD6FF', command=to_main_window)
+button_back.grid(row=0, column=11, sticky=sett.align_mode)
 
 aiueo_window.mainloop()
