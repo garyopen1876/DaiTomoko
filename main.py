@@ -82,11 +82,15 @@ def database_new(vocabulary):
     # 建立Connection物件
     conn = pymysql.connect(**sett.db_settings)
     # 建立Cursor物件
+
     with conn.cursor() as cursor:
         # 新增資料SQL語法
-        command = "INSERT INTO vocabulary(Numbe, Word, Hiragana, Chinese)VALUES(%s, %s, %s, %s)"
-
-        cursor.execute(command, (1, vocabulary['word'], vocabulary['hiragana'], vocabulary['chinese']))
+        cursor.execute("Select Count(*) from vocabulary")
+        vocabulary_number = cursor.fetchone()
+        vocabulary_number = int(vocabulary_number['Count(*)']) + 1
+        new_command = "INSERT INTO vocabulary(Numbe, Word, Hiragana, Chinese)VALUES(%s, %s, %s, %s)"
+        cursor.execute(new_command, (vocabulary_number, vocabulary['word'].get(), vocabulary['hiragana'].get()
+                                     , vocabulary['chinese'].get()))
     # 儲存變更
     conn.commit()
 
@@ -111,12 +115,6 @@ def vocabulary_new():
     land_chinese = tk.StringVar()
     entry_chinese = tk.Entry(new_window, width=20, textvariable=land_chinese)
 
-    vocabulary_detail = {
-        'word': entry_word,
-        'hiragana': entry_hiragana,
-        'chinese': entry_chinese
-    }
-
     # 排版
     show_word.grid(row=0, column=0, padx=10)
     entry_word.grid(row=0, column=1, padx=10)
@@ -125,6 +123,12 @@ def vocabulary_new():
     show_chinese.grid(row=2, column=0, padx=10)
     entry_chinese.grid(row=2, column=1, padx=10)
 
+    vocabulary_detail = {
+        'word': land_word,
+        'hiragana': land_hiragana,
+        'chinese': land_chinese
+    }
+    print(land_chinese.get()+"123")
     vocabulary_new_submit = tk.Button(new_window, text='確認', padx=20, pady=20, bg='#ACD6FF',
                                       command=lambda: database_new(vocabulary_detail))
     vocabulary_new_submit.grid(row=3, column=0, sticky=sett.align_mode)
