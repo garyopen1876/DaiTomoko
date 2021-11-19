@@ -26,22 +26,25 @@ vocabulary_array = []
 question_number = 0
 
 
-# 題庫會入
+# 題庫中的單字會入
 def vocabulary_in():
-    with open('日文詞彙.csv', encoding='utf-8-sig') as csvfile:
-        # 讀取 CSV 檔案內容
-        data = csv.reader(csvfile)
-        for line in data:
-            vocabulary_array.append(line)
+    global vocabulary_array
 
+    # 建立Connection物件
+    conn = pymysql.connect(**sett.db_settings)
+    # 建立Cursor物件
+    with conn.cursor() as cursor:
+        # 搜尋資料庫的單字
+        cursor.execute("Select * from vocabulary")
+        vocabulary_array = cursor.fetchall()
 
-# 隨機出題
+# 出題
 def question_show():
     global question_number
     question_number = random.randint(0, len(vocabulary_array)-1)
-    label_question = tk.Label(root, text=vocabulary_array[question_number][0], bg=sett.back_ground_color)
+    label_question = tk.Label(root, text=vocabulary_array[question_number]['Word'], bg=sett.back_ground_color)
     label_question.grid(row=0, column=0, columnspan=2)
-    label_mean = tk.Label(root, text=vocabulary_array[question_number][1], bg=sett.back_ground_color)
+    label_mean = tk.Label(root, text=vocabulary_array[question_number]['Chinese'], bg=sett.back_ground_color)
     label_mean.grid(row=1, column=0, columnspan=2)
 
 
@@ -55,14 +58,14 @@ def answer_show():
     new_window.iconbitmap(sett.icon)
     new_window.configure(bg='#FF95CA')
     # 顯示
-    label_wrong = tk.Label(new_window, text=vocabulary_array[question_number][2], bg=sett.back_ground_color)
+    label_wrong = tk.Label(new_window, text=vocabulary_array[question_number]['Hiragana'], bg=sett.back_ground_color)
     label_wrong.pack()
 
 
 # 答案比對
 def vocabulary_check():
     global question_number
-    if landString.get() == vocabulary_array[question_number][1]:
+    if landString.get() == vocabulary_array[question_number]['Hiragana']:
         # 回答正確 換題
         question_show()
     else:
@@ -128,7 +131,7 @@ def vocabulary_new():
         'hiragana': land_hiragana,
         'chinese': land_chinese
     }
-    print(land_chinese.get()+"123")
+
     vocabulary_new_submit = tk.Button(new_window, text='確認', padx=20, pady=20, bg='#ACD6FF',
                                       command=lambda: database_new(vocabulary_detail))
     vocabulary_new_submit.grid(row=3, column=0, sticky=sett.align_mode)
